@@ -5,13 +5,21 @@ import { User } from "../models/user.model.js";
 import { Comment } from "../models/comment.model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
 
+
 export const addNewPost = async (req, res) => {
     try {
-        const { caption } = req.body;
+        const { caption, duration } = req.body; // duration in hours
         const image = req.file;
         const authorId = req.id;
 
         if (!image) return res.status(400).json({ message: 'Image required' });
+
+        // Calculate expiration date if duration is provided
+        let expiresAt = null;
+        if (duration) {
+            expiresAt = new Date();
+            expiresAt.setHours(expiresAt.getHours() + parseInt(duration));
+        }
 
         // image upload 
         const optimizedImageBuffer = await sharp(image.buffer)
@@ -22,11 +30,15 @@ export const addNewPost = async (req, res) => {
         // buffer to data uri
         const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString('base64')}`;
         const cloudResponse = await cloudinary.uploader.upload(fileUri);
+        
         const post = await Post.create({
             caption,
             image: cloudResponse.secure_url,
-            author: authorId
+            author: authorId,
+            expiresAt,
+            isExpired: false
         });
+
         const user = await User.findById(authorId);
         if (user) {
             user.posts.push(post._id);
@@ -35,34 +47,60 @@ export const addNewPost = async (req, res) => {
 
         await post.populate({ path: 'author', select: '-password' });
 
+        // Schedule post expiration if duration is provided
+        if (duration) {
+            setTimeout(async () => {
+                try {
+                    const expiredPost = await Post.findById(post._id);
+                    if (expiredPost) {
+                        expiredPost.isExpired = true;
+                        await expiredPost.save();
+                    }
+                } catch (error) {
+                    console.error('Error expiring post:', error);
+                }
+            }, parseInt(duration) * 60 * 60 * 1000); // Convert hours to milliseconds
+        }
+
         return res.status(201).json({
             message: 'New post added',
             post,
             success: true,
-        })
+        });
 
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ message: 'Server error', success: false });
     }
 }
+           
+// Modify getAllPost to exclude expired posts
 export const getAllPost = async (req, res) => {
     try {
-        const posts = await Post.find().sort({ createdAt: -1 })
-            .populate({ path: 'author', select: 'username profilePicture' })
-            .populate({
-                path: 'comments',
-                sort: { createdAt: -1 },
-                populate: {
-                    path: 'author',
-                    select: 'username profilePicture'
-                }
-            });
+        const posts = await Post.find({
+            $or: [
+                { isExpired: false },
+                { expiresAt: { $gt: new Date() } }
+            ]
+        })
+        .sort({ createdAt: -1 })
+        .populate({ path: 'author', select: 'username profilePicture' })
+        .populate({
+            path: 'comments',
+            sort: { createdAt: -1 },
+            populate: {
+                path: 'author',
+                select: 'username profilePicture'
+            }
+        });
+
         return res.status(200).json({
             posts,
             success: true
-        })
+        });
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ message: 'Server error', success: false });
     }
 };
 export const getUserPost = async (req, res) => {
