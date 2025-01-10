@@ -1,4 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-  
+
+
+
+
+/* Instagram Stories Styles */
+.gradient-border {
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    padding: 2px;
+    border-radius: 50%;
+    animation: gradientRotate 4s linear infinite;
+}
+
+.viewed-border {
+    background: #8e8e8e;
+    padding: 2px;
+    border-radius: 50%;
+}
+
+/* Optional: Add animation for the gradient border */
+@keyframes gradientRotate {
+    0% {
+        background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    }
+    100% {
+        background: linear-gradient(405deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    }
+}

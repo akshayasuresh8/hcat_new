@@ -13,6 +13,7 @@ import { setSocket } from './redux/socketSlice'
 import { setOnlineUsers } from './redux/chatSlice'
 import { setLikeNotification } from './redux/rtnSlice'
 import ProtectedRoutes from './components/ProtectedRoutes'
+import StoryViewer from './components/StoryViewer';
 
 
 const browserRouter = createBrowserRouter([
@@ -85,6 +86,7 @@ function App() {
   return (
     <>
       <RouterProvider router={browserRouter} />
+      <StoryViewer />
     </>
   )
 }
