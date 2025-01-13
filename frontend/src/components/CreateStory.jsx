@@ -76,7 +76,7 @@ const CreateStory = ({ open, setOpen }) => {
                     </div>
                 ) : (
                     <div 
-                        className='w-full h-[400px] border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 cursor-pointer rounded-md' /* Fixed height */
+                        className='w-full h-[200px] border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 cursor-pointer rounded-md' /* Fixed height */
                         onClick={() => fileRef.current.click()}
                     >
                         <span className='text-gray-500'>Click to select media</span>
