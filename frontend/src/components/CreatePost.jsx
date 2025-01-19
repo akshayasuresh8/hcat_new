@@ -32,6 +32,13 @@ const CreatePost = ({ open, setOpen }) => {
     }
 
     const createPostHandler = async (e) => {
+        //Newly added for 24hrs 
+        const allowedDurations = ["permanent", "4", "8", "12", "24"];
+        if (!allowedDurations.includes(duration)) {
+            toast.error("Invalid duration. Please select a valid duration.");
+            return;
+        }
+
         const formData = new FormData();
         formData.append("caption", caption);
         if (duration !== "permanent") formData.append("duration", duration);
@@ -92,10 +99,10 @@ const CreatePost = ({ open, setOpen }) => {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="permanent">No expiration</SelectItem>
-                            <SelectItem value="1">1 hour</SelectItem>
+                            <SelectItem value="4">4 hours</SelectItem>
+                            <SelectItem value="8">8 hours</SelectItem>
+                            <SelectItem value="12">12 hours</SelectItem>
                             <SelectItem value="24">24 hours</SelectItem>
-                            <SelectItem value="48">48 hours</SelectItem>
-                            <SelectItem value="72">72 hours</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
