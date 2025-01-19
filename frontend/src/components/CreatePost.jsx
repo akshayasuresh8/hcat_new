@@ -15,7 +15,7 @@ const CreatePost = ({ open, setOpen }) => {
     const imageRef = useRef();
     const [file, setFile] = useState("");
     const [caption, setCaption] = useState("");
-    const [duration, setDuration] = useState("permanent");// New state for post duration
+    const [duration, setDuration] = useState("1 hour");// New state for post duration
     const [imagePreview, setImagePreview] = useState("");
     const [loading, setLoading] = useState(false);
     const {user} = useSelector(store=>store.auth);
@@ -33,7 +33,7 @@ const CreatePost = ({ open, setOpen }) => {
 
     const createPostHandler = async (e) => {
         //Newly added for 24hrs 
-        const allowedDurations = ["permanent", "4", "8", "12", "24"];
+        const allowedDurations = ["1", "4", "8", "12", "24"];
         if (!allowedDurations.includes(duration)) {
             toast.error("Invalid duration. Please select a valid duration.");
             return;
@@ -41,7 +41,8 @@ const CreatePost = ({ open, setOpen }) => {
 
         const formData = new FormData();
         formData.append("caption", caption);
-        if (duration !== "permanent") formData.append("duration", duration);
+        //if (duration !== "permanent") 
+        formData.append("duration", duration);
         if (imagePreview) formData.append("image", file);
 
         try {
@@ -92,13 +93,13 @@ const CreatePost = ({ open, setOpen }) => {
                     <Select 
                         value={duration} 
                         onValueChange={setDuration}
-                        defaultValue="permanent"
+                        defaultValue=" Select Duration"
                     >
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Post duration" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="permanent">No expiration</SelectItem>
+                            <SelectItem value="1">1 hour</SelectItem>
                             <SelectItem value="4">4 hours</SelectItem>
                             <SelectItem value="8">8 hours</SelectItem>
                             <SelectItem value="12">12 hours</SelectItem>

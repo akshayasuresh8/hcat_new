@@ -16,9 +16,9 @@ export const addNewPost = async (req, res) => {
 
 
         // Newly added function for enforcing time duration allowed.
-        const allowedDurations = [4, 8, 12, 24];
+        const allowedDurations = [1,4, 8, 12, 24];
         if (duration && !allowedDurations.includes(parseInt(duration))) {
-            return res.status(400).json({ message: 'Invalid duration. Allowed durations are 4, 8, 12, and 24 hours.' });
+            return res.status(400).json({ message: 'Invalid duration. Allowed durations are 1, 4, 8, 12, and 24 hours.' });
         }
 
         // Calculate expiration date if duration is provided
